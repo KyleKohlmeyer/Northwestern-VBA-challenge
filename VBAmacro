@@ -1,0 +1,147 @@
+Sub stockticker()
+'create variable for ticker
+Dim ticker As String
+
+'create a variable for the row that the stock information will be reported to on the ticker
+Dim tickerrow As Integer
+
+'create variable for yearly change
+Dim yearchange As Double
+
+'create variable for percent change
+Dim percentchange As Double
+
+'create variable for the total volume of stocks traded
+Dim totalvolume As Double
+
+'create variable to keep track of the rowcount
+Dim rowcount As Long
+
+'Variables for calculating year and percent change
+Dim startprice As Double
+Dim endprice As Double
+
+' Variables for counting lowest percent change, highest percent change, and max volume
+Dim maxvalue As Double
+Dim lowestpercent As Double
+Dim highestpercent As Double
+
+'Rowcount for finding maxes and mins
+Dim finalrowcount As Long
+  
+'general variable setting and formatting for each worksheet.
+For Each ws In Worksheets
+totalvolume = 0
+tickerrow = 2
+percentchange = 0
+yearchange = 0
+startprice = ws.Range("C2").Value
+
+'column/row Headings
+ws.Range("I1").Value = "Ticker"
+ws.Range("J1").Value = "Yearly change"
+ws.Range("K1").Value = "Percent change"
+ws.Range("L1").Value = "Total Stock Volume"
+ws.Range("P1").Value = "Ticker"
+ws.Range("Q1").Value = "Value"
+ws.Range("O2").Value = "Greatest % increase"
+ws.Range("O3").Value = "Greatest % decrease"
+ws.Range("O4").Value = "Greatest total volume"
+'Find the rowcount for each sheet
+rowcount = Cells(Rows.Count, "A").End(xlUp).Row
+
+For i = 2 To rowcount
+'If statement to check to see if the ticker for the new row is the same as the preceding row
+If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+'If the row is different, add a new line to the ticker row to indicate new stock
+ticker = ws.Cells(i, 1).Value
+
+'find endprice at end of year
+endprice = ws.Cells(i, 6).Value
+
+'find yearchange
+yearchange = endprice - startprice
+'find percentchange
+
+percentchange = ((endprice - startprice) / endprice)
+
+'Begin counting a new total volume for the stock
+totalvolume = totalvolume + ws.Cells(i, 7).Value
+
+'print results
+ws.Range("I" & tickerrow).Value = ticker
+ws.Range("L" & tickerrow).Value = totalvolume
+ws.Range("J" & tickerrow).Value = yearchange
+ws.Range("K" & tickerrow).Value = percentchange
+'set percentage formatting for percentchange
+ws.Range("K" & tickerrow).NumberFormat = "0.00%"
+'conditional formatting
+If yearchange < 0 Then
+ws.Range("J" & tickerrow).Interior.ColorIndex = 3
+Else
+ws.Range("J" & tickerrow).Interior.ColorIndex = 4
+End If
+
+'set startprice to new value
+startprice = ws.Cells(i + 1, 3).Value
+'set endprice back to 0
+endprice = 0
+'set yearchange back to 0
+yearchange = 0
+'set percentchange back to 0
+percentchange = 0
+'Add one to the ticker row so that next stock doesnt override data
+tickerrow = tickerrow + 1
+'reset totalvolume count so that the total for the next stock starts at 0
+totalvolume = 0
+
+Else
+'If the If statement determines that the next row is same stock, just update the total
+totalvolume = totalvolume + ws.Cells(i, 7).Value
+
+End If
+'move to next i
+Next i
+
+'Find the rowcount for each unique stock on each page
+finalrowcount = Cells(Rows.Count, "I").End(xlUp).Row
+'initialize variables
+maxvalue = 0
+lowestpercent = 0
+highestpercent = 0
+
+'For loop for calculating min/max
+For j = 2 To finalrowcount
+'Calculation for determining max value of volume. Works by comparing each row to the previous max, starting at 0.
+'If the value is greater than previous max, then it is printed on the sheet and becomes the new maximum value
+'If another value comes along that is higher, the previous printout is overridden.
+If ws.Cells(j, 12).Value > maxvalue Then
+ws.Range("P4") = ws.Cells(j, 9).Value
+ws.Range("Q4") = ws.Cells(j, 12).Value
+'Keep track of new max value
+maxvalue = ws.Cells(j, 12).Value
+Else
+'We dont care if the value isnt the max, so nothing here
+End If
+
+'Same idea as before, but for finding lowest percentage
+If ws.Cells(j, 11).Value < lowestpercent Then
+ws.Range("P3") = ws.Cells(j, 9).Value
+ws.Range("Q3") = ws.Cells(j, 11).Value
+'Converts format to percentage
+ws.Range("Q3").NumberFormat = "0.00%"
+lowestpercent = ws.Cells(j, 11).Value
+Else
+End If
+
+'Same idea as before, but for finding highest percentage
+If ws.Cells(j, 11).Value > highestpercent Then
+ws.Range("P2") = ws.Cells(j, 9).Value
+ws.Range("Q2") = ws.Cells(j, 11).Value
+ws.Range("Q2").NumberFormat = "0.00%"
+highestpercent = ws.Cells(j, 11).Value
+Else
+End If
+Next j
+Next ws
+End Sub
