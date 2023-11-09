@@ -1,4 +1,5 @@
 Sub stockticker()
+
 'create variable for ticker
 Dim ticker As String
 
@@ -28,7 +29,7 @@ Dim highestpercent As Double
 
 'Rowcount for finding maxes and mins
 Dim finalrowcount As Long
-  
+
 'general variable setting and formatting for each worksheet.
 For Each ws In Worksheets
 totalvolume = 0
@@ -78,8 +79,10 @@ ws.Range("K" & tickerrow).NumberFormat = "0.00%"
 'conditional formatting
 If yearchange < 0 Then
 ws.Range("J" & tickerrow).Interior.ColorIndex = 3
+ws.Range("K" & tickerrow).Interior.ColorIndex = 3
 Else
 ws.Range("J" & tickerrow).Interior.ColorIndex = 4
+ws.Range("K" & tickerrow).Interior.ColorIndex = 4
 End If
 
 'set startprice to new value
@@ -142,6 +145,8 @@ ws.Range("Q2").NumberFormat = "0.00%"
 highestpercent = ws.Cells(j, 11).Value
 Else
 End If
+
 Next j
 Next ws
 End Sub
+
