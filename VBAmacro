@@ -64,7 +64,7 @@ endprice = ws.Cells(i, 6).Value
 yearchange = endprice - startprice
 'find percentchange
 
-percentchange = ((endprice - startprice) / endprice)
+percentchange = (yearchange / startprice)
 
 'Begin counting a new total volume for the stock
 totalvolume = totalvolume + ws.Cells(i, 7).Value
